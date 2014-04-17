@@ -200,7 +200,7 @@ function handleFileSelect(evt) {
   		fullpath.lastIndexOf('/') ) + 1;
 
   	var len = fullpath.length - start;
-  	var str = new Array(len + 1).join( '•' );
+  	var str = new Array(len + 1).join( '&#x2022;' );
 
   	$("#fake_filename").html( str );
 
