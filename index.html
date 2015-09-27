@@ -114,7 +114,7 @@ img {
 
 	<br>
 	<span id="output"><br></span>
-	<div class="outdiv" id="result" onclick="digest()" >Click to generate, or press Enter</div>
+	<div class="outdiv" id="result" onclick="updateResult()" >Click to generate, or press Enter</div>
 	<div class="outdiv" id="qrcode"></div>
 </div>
 
@@ -123,7 +123,7 @@ img {
 <script type="text/javascript" src="CryptoJS/rollups/sha3.js"></script>
 <script type="text/javascript" src="CryptoJS/components/enc-base64-min.js"></script>
 <script type="text/javascript" src="jquery-1.11.0.min.js"></script>
-<script type="text/javascript" src="jquery-ui-1.10.4.min"></script>
+<script type="text/javascript" src="jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="qrcode.js"></script>
 <script>
 
@@ -186,7 +186,7 @@ function handleFileSelect(evt) {
 	    	key = CryptoJS.SHA3(e.target.result);
 
 	    	if( checkValidInput() ) {
-	    		digest();
+	    		updateResult();
 	    	}
 	    };
 
@@ -287,16 +287,50 @@ function createQRCode(text, typeNumber, errorCorrectLevel, table) {
 	return qr.createImgTag();
 };
 
-function digest() {
+function makePassword(userName, actualURL, length, oldPassword) {
+	if(length < 5) {
+		length = 5;
+	}
+
+	var hmacHasher = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key);
+
+	var pass = hmacHasher.finalize( actualURL + userName + oldPassword ).toString(CryptoJS.enc.Base64);
+
+	return pass.substring(0, length);
+}
+
+function isSafeEnough(password) {
+	return true;
+	var lowercase = false;
+	var number = false;
+	var symbol = false;
+	var uppercase = false;
+
+	for (var i = password.length - 1; i >= 0; i--) {
+		var c = password[i];
+
+		if(c >= 'a' && c <= 'z') {
+			lowercase = true;
+		}
+		else if(c >= 'A' && c <= 'Z') {
+			uppercase = true;
+		}
+		else if(c >= '0' && c <= '9') {
+			number = true;
+		}
+		else {
+			symbol = true;
+		}
+	};
+	return lowercase && number && symbol && uppercase;
+}
+
+function updateResult() {
 
 	updateCompletions();
 	
 	if( inputComplete ) {
 		var userName = $("#username").val()
-
-		var hmacHasher = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key);
-
-		var pass = hmacHasher.finalize( actualURL + userName ).toString(CryptoJS.enc.Base64);
 
 		if( userName.length )
 			$("#output").html( "<b>"+ userName + "</b>'s password for <b>" + actualURL + "</b> is<br>"  );
@@ -305,18 +339,20 @@ function digest() {
 
 		var l = $("#length").val()
 
-		if( l < 5 )
-			l = 5;
-		if( l > pass.length-1 )
-			l = pass.length-1
+		//keep chaining the old password to the salt until we get a password that is safe enough
+		var password = "";
+		do {
+			password = makePassword(userName, actualURL, l, password);
+		}
+		while(!isSafeEnough(password));
 
-		$("#length").val(l)
+		$("#length").val(password.length);
 
 		var resultElem = document.getElementById("result");
-		resultElem.innerHTML = pass.substring( 0, l )
+		resultElem.innerHTML = password
 
 		var qrcodeElem = document.getElementById("qrcode");
-		var qrcode = createQRCode( resultElem.innerHTML );
+		var qrcode = createQRCode( password );
 		qrcodeElem.innerHTML = qrcode;
 
 		autoSelect(resultElem)
@@ -327,14 +363,14 @@ document.getElementById('keyfile').addEventListener('change', handleFileSelect, 
 document.getElementById('keyfile').innerHTML = "lolzor"
 
 $(document).keypress(function(e) {
-  	if(e.which == 13) {
-  		digest();
+  	if(e.which == 13) {	
+  		updateResult();
   	}
 });
 
 $("#input").on('change keyup paste mouseup', function() {
     if(event.keyCode == 13) {
-        digest();
+        updateResult();
     }
     else if ($(this).val() != currentURL) {
         currentURL = $(this).val();
