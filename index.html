@@ -116,7 +116,7 @@ img {
 	<span id="output"><br></span>
 	<div class="outdiv" id="result" >
 		<span id="password_field" onclick="updateResult()">Click to generate, or press Enter</span>
-		<button id="copy-button" data-clipboard-text="Copy Me!" data-copied-hint="Copied!" title="Click to copy me." style="display: none;">Copy!</button>
+		<button class="btn" id="copy-button" data-clipboard-target="#password_field" title="Click to copy me." style="display:none;">Copy!</button>
 	</div>
 	<div class="outdiv" id="qrcode"></div>
 </div>
@@ -128,7 +128,7 @@ img {
 <script type="text/javascript" src="jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="qrcode.js"></script>
-<script type="text/javascript" src="ZeroClipboard.js"></script>
+<script type="text/javascript" src="clipboard.min.js"></script>
 
 <script>
 
@@ -145,6 +145,7 @@ var inputComplete = false;
 
 var resultElem = document.getElementById("password_field");
 var copyButton = document.getElementById("copy-button");
+var clipboard = new Clipboard('.btn');
 
 //allow for insta-copy-paste
 
@@ -388,14 +389,7 @@ $("#input").on('change keyup paste mouseup', function() {
     }
 });
 
-var zerocopy = new ZeroClipboard( copyButton );
 
-zerocopy.on( "ready", function( readyEvent ) {
-	zerocopy.on( "copy", function (event) {
-	  var clipboard = event.clipboardData;
-	  clipboard.setData( "text/plain", resultElem.innerHTML );
-	});
-} );
 
 </script>
 
