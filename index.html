@@ -362,6 +362,7 @@ function updateResult() {
 		var qrcodeElem = document.getElementById("qrcode");
 		var qrcode = createQRCode( password );
 		qrcodeElem.innerHTML = qrcode;
+		qrcodeElem.firstChild.style.imageRendering = "pixelated";
 
 		autoSelect(resultElem)
 
