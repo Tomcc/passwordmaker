@@ -114,7 +114,10 @@ img {
 
 	<br>
 	<span id="output"><br></span>
-	<div class="outdiv" id="result" onclick="updateResult()" >Click to generate, or press Enter</div>
+	<div class="outdiv" id="result" onclick="updateResult()" >
+		<span id="password_field">Click to generate, or press Enter</span>
+		<button id="copy-button" data-clipboard-text="Copy Me!" data-copied-hint="Copied!" title="Click to copy me." style="display: none;">Copy!</button>
+	</div>
 	<div class="outdiv" id="qrcode"></div>
 </div>
 
@@ -125,6 +128,8 @@ img {
 <script type="text/javascript" src="jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="qrcode.js"></script>
+<script type="text/javascript" src="ZeroClipboard.js"></script>
+
 <script>
 
 if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -137,6 +142,9 @@ var key = null;
 var actualURL = null;
 var currentURL = '';
 var inputComplete = false;
+
+var resultElem = document.getElementById("password_field");
+var copyButton = document.getElementById("copy-button");
 
 //allow for insta-copy-paste
 
@@ -348,7 +356,6 @@ function updateResult() {
 
 		$("#length").val(password.length);
 
-		var resultElem = document.getElementById("result");
 		resultElem.innerHTML = password
 
 		var qrcodeElem = document.getElementById("qrcode");
@@ -356,6 +363,8 @@ function updateResult() {
 		qrcodeElem.innerHTML = qrcode;
 
 		autoSelect(resultElem)
+
+		copyButton.style.display = "inline"
 	}
 }
 
@@ -378,6 +387,15 @@ $("#input").on('change keyup paste mouseup', function() {
      	parseURL();
     }
 });
+
+var zerocopy = new ZeroClipboard( copyButton );
+
+zerocopy.on( "ready", function( readyEvent ) {
+	zerocopy.on( "copy", function (event) {
+	  var clipboard = event.clipboardData;
+	  clipboard.setData( "text/plain", resultElem.innerHTML );
+	});
+} );
 
 </script>
 
