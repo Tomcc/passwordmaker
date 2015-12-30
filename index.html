@@ -112,6 +112,7 @@ img {
 	<span id="input_desc">Enter the URL of your site:</span> <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="input"><br><span id="actualurl" class="style_hint"></span> <br><br>
 	Username <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="username"><br><span class="style_hint">It's an optional secret code</span><br><br>
 	Set the password length: <input type="number" id="length" value="20"/><br><br>
+	Allow symbols (/+): <input type="checkbox" id="includeSymbols" checked/><br><br>
 
 	<br>
 	<span id="output"><br></span>
@@ -309,7 +310,7 @@ function makePassword(userName, actualURL, length, oldPassword) {
 	return pass.substring(0, length);
 }
 
-function isSafeEnough(password) {
+function isCorrectCharset(password, includeLowercase, includeNumbers, includeSymbols, includeUppercase) {
 
 	var lowercase = false;
 	var number = false;
@@ -331,8 +332,9 @@ function isSafeEnough(password) {
 		else {
 			symbol = true;
 		}
-	};
-	return lowercase && number && symbol && uppercase;
+	}
+
+	return lowercase === includeLowercase && number === includeNumbers && symbol === includeSymbols && uppercase === includeUppercase;
 }
 
 function updateResult() {
@@ -347,14 +349,16 @@ function updateResult() {
 		else
 			$("#output").html( "Your password for <b>" + actualURL + "</b> is<br>"  );
 
-		var l = $("#length").val()
+		var l = $("#length").val();
+
+		var includeSymbols = $("#includeSymbols").prop('checked');
 
 		//keep chaining the old password to the salt until we get a password that is safe enough
 		var password = "";
 		do {
 			password = makePassword(userName, actualURL, l, password);
 		}
-		while(!isSafeEnough(password));
+		while(!isCorrectCharset(password, true, true, includeSymbols, true));
 
 		$("#length").val(password.length);
 
