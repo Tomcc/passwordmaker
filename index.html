@@ -109,8 +109,8 @@ img {
 	<span id="keyfile_desc">Choose your key file:</span> <br>
 	<input type="file" id="keyfile" /><b> <span id="fake_filename">No file selected</span></b>	<br>
 	<span class="style_warning">WARNING: you will lose your passwords losing this file, or changing it in any way!</span><br><br>
+	<span id = "masterpass_desc">Master password <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="password" id="masterpass"><br><span class="style_hint">You'll need to remember this one too</span><br><br></span>
 	<span id="input_desc">Enter the URL of your site:</span> <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="input"><br><span id="actualurl" class="style_hint"></span> <br><br>
-	Username <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="username"><br><span class="style_hint">It's an optional secret code</span><br><br>
 	Set the password length: <input type="number" id="length" value="20"/><br><br>
 	Allow symbols (/+): <input type="checkbox" id="includeSymbols" checked/><br><br>
 
@@ -179,7 +179,7 @@ function autoSelect (elem) {
 }
 
 function checkValidInput() {
-	var d = !key || !actualURL || actualURL.length == 0;
+	var d = !key || !actualURL || actualURL.length == 0 || !isMasterPassValid();
 
 	inputComplete = !d;
 	return inputComplete;
@@ -282,10 +282,23 @@ function setErrorClass(elem, error) {
 		elem.animate({color: "#00AA00" });
 }
 
+function getMasterPass() {
+	var pass = $("#masterpass").val();
+	if(!pass) {
+		return ""
+	}
+	return pass
+}
+
+function isMasterPassValid() {
+	return getMasterPass().length > 0
+}
+
 function updateCompletions() {
 
 	setErrorClass( $("#keyfile_desc"), !key );
 	setErrorClass( $("#input_desc"), !actualURL || actualURL.length == 0 );
+	setErrorClass( $("#masterpass_desc"), !isMasterPassValid())
 }
 
 function createQRCode(text, typeNumber, errorCorrectLevel, table) {
@@ -298,14 +311,14 @@ function createQRCode(text, typeNumber, errorCorrectLevel, table) {
 	return qr.createImgTag();
 };
 
-function makePassword(userName, actualURL, length, oldPassword) {
+function makePassword(masterpass, actualURL, length, oldPassword) {
 	if(length < 5) {
 		length = 5;
 	}
 
 	var hmacHasher = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key);
 
-	var pass = hmacHasher.finalize( actualURL + userName + oldPassword ).toString(CryptoJS.enc.Base64);
+	var pass = hmacHasher.finalize( actualURL + masterpass + oldPassword ).toString(CryptoJS.enc.Base64);
 
 	return pass.substring(0, length);
 }
@@ -342,10 +355,10 @@ function updateResult() {
 	updateCompletions();
 	
 	if( inputComplete ) {
-		var userName = $("#username").val()
+		var masterpass = $("#masterpass").val()
 
-		if( userName.length )
-			$("#output").html( "<b>"+ userName + "</b>'s password for <b>" + actualURL + "</b> is<br>"  );
+		if( masterpass.length )
+			$("#output").html( "<b>"+ masterpass + "</b>'s password for <b>" + actualURL + "</b> is<br>"  );
 		else
 			$("#output").html( "Your password for <b>" + actualURL + "</b> is<br>"  );
 
@@ -356,7 +369,7 @@ function updateResult() {
 		//keep chaining the old password to the salt until we get a password that is safe enough
 		var password = "";
 		do {
-			password = makePassword(userName, actualURL, l, password);
+			password = makePassword(masterpass, actualURL, l, password);
 		}
 		while(!isCorrectCharset(password, true, true, includeSymbols, true));
 
