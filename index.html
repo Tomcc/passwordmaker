@@ -5,20 +5,17 @@
 
 	<meta charset="UTF-8">
 
-	<link href='http://fonts.googleapis.com/css?family=Anonymous+Pro' rel='stylesheet' type='text/css'>
+	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 </head>
 <body>
 
 <style>
 
-* {
-	font-family: 'Open Sans', sans-serif;
-	text-shadow: 0px 1px 0px rgba(255,255,255,.5);
-}
-
 body {
 	background-color: #242220;
+	font-family: 'Open Sans', sans-serif;
+	text-shadow: 0px 1px 0px rgba(255,255,255,.5);
 }
 
 .style_hint, .style_warning {
@@ -70,7 +67,7 @@ input[type="file"] {
 }
 
 .outdiv {
-	font-family: 'Anonymous Pro', sans-serif;
+	font-family: 'Source Code Pro', monospace;
 	background-color:#E6DB74;
 	padding: 0.7em;
 	font-size: 1.5em;
@@ -107,10 +104,10 @@ img {
 	<h1>Make password, yes?</h1>
 	<hr><br>
 	<span id="keyfile_desc">Choose your key file:</span> <br>
-	<input type="file" id="keyfile" /><b> <span id="fake_filename">No file selected</span></b>	<br>
+	<input autofocus type="file" id="keyfile" /><b> <span id="fake_filename">No file selected</span></b>	<br>
 	<span class="style_warning">WARNING: you will lose your passwords losing this file, or changing it in any way!</span><br><br>
-	<span id="input_desc">Enter the URL of your site:</span> <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="input"><br><span id="actualurl" class="style_hint"></span> <br><br>
-	Username <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="username"><br><span class="style_hint">It's an optional secret code</span><br><br>
+	<span id="input_desc">Enter the URL of your site:</span> <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="url" id="input"><br><span id="actualurl" class="style_hint"></span> <br><br>
+	Passphrase <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="password" id="username"><br><span class="style_hint">(optional) protect your key file</span><br><br>
 	Set the password length: <input type="number" id="length" value="20"/><br><br>
 	Allow symbols (/+): <input type="checkbox" id="includeSymbols" checked/><br><br>
 
