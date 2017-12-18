@@ -53,9 +53,8 @@ body {
 }
 
 input {
-	padding: 0.1em;
-	font-size: 105%;
-	display: inline-block;
+	padding: 0.5em;
+	/*display: inline-block;*/
 	border-radius:0.3em;
 	float: right;
 	border-style: dotted;
@@ -70,9 +69,25 @@ input:focus {
 	border-color: #AADDEE;
 }
 
-input[type="file"] {
-	float: center;
-	padding: 0.7em;
+input[type="color"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+input[type="file"],
+  select,
+  textarea,
+textarea {
+  font-size: 16px;
 }
 
 .outdiv {
@@ -114,12 +129,11 @@ img {
 	<input autofocus type="file" id="keyfile" /><b> <span id="fake_filename">No file selected</span></b>	<br>
 	<span class="style_warning">WARNING: you will lose your passwords losing this file, or changing it in any way!</span><br><br>
 	<span id="input_desc">Enter the URL of your site:</span> <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="url" id="input"><br><span id="actualurl" class="style_hint"></span> <br><br>
-	Passphrase <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="password" id="username"><br><span class="style_hint">(optional) protect your key file</span><br><br>
+	Passphrase <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="password" id="passphrase"><br><span class="style_hint">(optional) protect your key file</span><br><br>
 	Set the password length: <input type="number" id="length" value="20"/><br><br>
 	Allow symbols (/+): <input type="checkbox" id="includeSymbols" checked/><br><br>
 
 	<br>
-	<span id="output"><br></span>
 	<div class="outdiv" id="result" >
 		<span id="password_field" onclick="updateResult()">Click to generate, or press Enter</span>
 		<button class="btn" id="copy-button" data-clipboard-target="#password_field" title="Click to copy me." style="display:none;">Copy!</button>
@@ -302,14 +316,14 @@ function createQRCode(text, typeNumber, errorCorrectLevel, table) {
 	return qr.createImgTag();
 };
 
-function makePassword(userName, actualURL, length, oldPassword) {
+function makePassword(passphrase, actualURL, length, oldPassword) {
 	if(length < 5) {
 		length = 5;
 	}
 
 	var hmacHasher = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key);
 
-	var pass = hmacHasher.finalize( actualURL + userName + oldPassword ).toString(CryptoJS.enc.Base64);
+	var pass = hmacHasher.finalize( actualURL + passphrase + oldPassword ).toString(CryptoJS.enc.Base64);
 
 	return pass.substring(0, length);
 }
@@ -346,12 +360,7 @@ function updateResult() {
 	updateCompletions();
 	
 	if( inputComplete ) {
-		var userName = $("#username").val()
-
-		if( userName.length )
-			$("#output").html( "<b>"+ userName + "</b>'s password for <b>" + actualURL + "</b> is<br>"  );
-		else
-			$("#output").html( "Your password for <b>" + actualURL + "</b> is<br>"  );
+		var passphrase = $("#passphrase").val()
 
 		var l = $("#length").val();
 
@@ -360,7 +369,7 @@ function updateResult() {
 		//keep chaining the old password to the salt until we get a password that is safe enough
 		var password = "";
 		do {
-			password = makePassword(userName, actualURL, l, password);
+			password = makePassword(passphrase, actualURL, l, password);
 		}
 		while(!isCorrectCharset(password, true, true, includeSymbols, true));
 
