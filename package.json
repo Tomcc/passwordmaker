@@ -1,0 +1,39 @@
+{
+  "name": "passwordmaker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tomcc/passwordmaker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tomcc/passwordmaker/issues"
+  },
+  "homepage": "https://github.com/Tomcc/passwordmaker#readme",
+  "devDependencies": {
+    "@types/react": "^16.4.17",
+    "@types/react-dom": "^16.0.9",
+    "favicons-webpack-plugin": "0.0.9",
+    "git-revision-webpack-plugin": "^3.0.3",
+    "html-webpack-plugin": "^3.2.0",
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^5.2.2",
+    "typescript": "^3.1.3",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9",
+    "webpack-merge": "^4.1.4"
+  },
+  "dependencies": {
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  }
+}
