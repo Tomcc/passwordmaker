@@ -26,7 +26,7 @@ module.exports = {
 
     plugins: [
         new HtmlWebpackPlugin({
-            title: "Passwordmaker",
+            title: "PASSMAKER",
             filename: "index.html",
             minify: true,
             hash: true,
@@ -40,7 +40,7 @@ module.exports = {
         new FaviconsWebpackPlugin({
             // Your source logo
             logo: './src/images/logo.png',
-            title: 'Passwordmaker',
+            title: 'PASSMAKER',
             background: "#363644"
         }),
     ]

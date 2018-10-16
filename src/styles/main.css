@@ -1,0 +1,101 @@
+body {
+    background-color: #242220;
+    font-family: 'Open Sans', sans-serif;
+    text-shadow: 0px 1px 0px rgba(255, 255, 255, .5);
+}
+
+.style_hint, .style_warning {
+    font-size: 82%;
+    padding-left: 1em;
+}
+
+.style_warning {
+    color: #CC8888;
+    max-width: 45%;
+}
+
+.style_hint {
+    font-style: italic;
+    color: #888888;
+}
+
+.container {
+    margin: 0 auto;
+    width: 95%;
+    max-width: 35em;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #EEEEEE;
+    padding: 1em;
+    background-color: #FDFDFA;
+}
+
+input, .fake_button {
+    padding: 0.5em;
+    border-radius: 0.3em;
+    float: right;
+    border-style: dotted;
+    border-color: #CCCCCC;
+    border-width: 0.1em;
+    background-color: #FAFAFA;
+    min-width: 13.5em;
+}
+
+#keyfile {
+    display: none;
+}
+
+.fake_button {
+    min-width: 14.7em;
+    text-align: left
+}
+
+input:focus, .fake_button:focus {
+    outline: 0;
+    background-color: white;
+    border-color: #AADDEE;
+}
+
+.outdiv {
+    font-family: 'Source Code Pro', monospace;
+    background-color: #E6DB74;
+    padding: 0.7em;
+    font-size: 175%;
+    text-align: center;
+    float: center;
+    margin: 0 auto;
+}
+
+img {
+    width: 8em;
+    height: 8em;
+}
+
+.outdiv:hover {
+    background-color: #EEDD77;
+}
+
+.style_error {
+    color: #AA0000;
+}
+
+.style_ok {
+    color: #00AA00;
+}
+
+.fake_button, input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="email"], input[type="month"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="time"], input[type="url"], input[type="week"], input[type="file"], select, textarea, textarea {
+    font-size: 100%;
+}
+
+.formsection {
+    padding: 1em;
+}
+
+/* @media (-webkit-min-device-pixel-ratio: 2) {
+    body {
+        font-size: 200%;
+    }
+    .fake_button, input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="email"], input[type="month"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="time"], input[type="url"], input[type="week"], input[type="file"], select, textarea, textarea {
+        font-size: 150%;
+    }
+} */
