@@ -5,7 +5,7 @@ declare class UIFileComponentProps {
 }
 
 class UIFileComponentState {
-    selectedFile: string | undefined;
+    public selectedFile: string | undefined;
 }
 
 export class UIFileComponent extends React.Component {
@@ -23,7 +23,7 @@ export class UIFileComponent extends React.Component {
 
     public onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
         function handle() {
-            if (!e.target.files || e.target.files.length == 0) {
+            if (!e.target.files || e.target.files.length === 0) {
                 return;
             }
 
@@ -34,7 +34,7 @@ export class UIFileComponent extends React.Component {
             return e.target.files[0].name;
         }
 
-        let filename = handle();
+        const filename = handle();
         if (filename) {
             this.props.onFilePicked(filename);
 
@@ -45,17 +45,9 @@ export class UIFileComponent extends React.Component {
         }
     }
 
-    private fileFieldContent(): string {
-        // place a bunch of dots in the out field
-        if (this.state.selectedFile) {
-            return new Array(this.state.selectedFile.length + 1).join('•');
-        }
-        return "No file selected";
-    }
-
     public render() {
         return <p className="formsection">
-            <span id="keyfile_desc">Choose your key file:</span>
+            <span>Choose your key file{this.okText()}</span>
             <input
                 className="invisible_picker"
                 type="file"
@@ -67,7 +59,24 @@ export class UIFileComponent extends React.Component {
                 className="fake_button">
                 <b>{this.fileFieldContent()}</b>
             </button>
-            <p className="style_warning">WARNING: you will lose your passwords losing this file, or changing it in any way!</p>
-        </p>
+            <p className="style_warning">
+                WARNING: you will lose your passwords losing this file, or changing it in any way!
+                </p>
+        </p>;
+    }
+
+    private fileFieldContent(): string {
+        // place a bunch of dots in the out field
+        if (this.state.selectedFile) {
+            return new Array(this.state.selectedFile.length + 1).join("•");
+        }
+        return "No file selected";
+    }
+
+    private okText(): string {
+        if (this.state.selectedFile) {
+            return " ✔️";
+        }
+        return ":";
     }
 }
