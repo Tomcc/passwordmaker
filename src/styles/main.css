@@ -41,7 +41,7 @@ input, .fake_button {
     min-width: 13.5em;
 }
 
-#keyfile {
+.invisible_picker {
     display: none;
 }
 
