@@ -59,7 +59,7 @@ input:focus, .fake_button:focus {
 .outdiv {
     font-family: 'Source Code Pro', monospace;
     background-color: #E6DB74;
-    padding: 0.7em;
+    padding: 0.1em;
     font-size: 175%;
     text-align: center;
     float: center;

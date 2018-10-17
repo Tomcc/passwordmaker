@@ -1,11 +1,11 @@
 import * as React from "react";
 
 declare class UIFileComponentProps {
-    public onFilePicked: (name: string) => void;
+    public onFilePicked: (name: File | undefined) => void;
 }
 
 class UIFileComponentState {
-    public selectedFile: string | undefined;
+    public selectedFile: File | undefined;
 }
 
 export class UIFileComponent extends React.Component {
@@ -22,7 +22,7 @@ export class UIFileComponent extends React.Component {
     }
 
     public onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-        function handle() {
+        function validateFile(): File | undefined {
             if (!e.target.files || e.target.files.length === 0) {
                 return;
             }
@@ -31,18 +31,13 @@ export class UIFileComponent extends React.Component {
                 alert("Select only one file");
                 return;
             }
-            return e.target.files[0].name;
+            return e.target.files[0];
         }
 
-        const filename = handle();
-        if (filename) {
-            this.props.onFilePicked(filename);
+        const file = validateFile();
 
-            this.setState({ selectedFile: filename });
-        }
-        else {
-            this.setState({ selectedFile: undefined });
-        }
+        this.props.onFilePicked(file);
+        this.setState({ selectedFile: file });
     }
 
     public render() {
@@ -68,7 +63,7 @@ export class UIFileComponent extends React.Component {
     private fileFieldContent(): string {
         // place a bunch of dots in the out field
         if (this.state.selectedFile) {
-            return new Array(this.state.selectedFile.length + 1).join("•");
+            return new Array(this.state.selectedFile.name.length + 1).join("•");
         }
         return "No file selected";
     }

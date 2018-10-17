@@ -1,37 +1,59 @@
 import "./styles/main.css";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as QRCode from "qrcode.react";
 import { UIDomainInput } from "./domain_component";
 import { UIFileComponent } from "./file_component";
 import "react-toggle/style.css";
 import Toggle from "react-toggle";
-
-function HACK_UPDATERESULT() {
-    alert("LOL");
-}
+import { UIPassPhraseInput } from "./passphrase_input";
 
 class UIRootState {
     public canGenerate: boolean = false;
+    public generating: boolean = false;
+    public password: string | undefined;
 }
 
 class UIRoot extends React.Component {
     public state = new UIRootState();
 
-    private filename: string | undefined;
+    private file: File | undefined;
     private domain: string | undefined;
+    private phrase: string | undefined;
+    private symbolsAllowed: boolean = true;
 
-    public onFilePicked = (name: string) => {
-        this.filename = name;
-        this.updateState();
+    private passwordLengthRef = React.createRef<HTMLInputElement>();
+
+    public onFilePicked = (name: File | undefined) => {
+        this.file = name;
+        this.updateInputs();
     }
 
     public onDomainPicked = (domain: string) => {
         this.domain = domain;
-        this.updateState();
+        this.updateInputs();
     }
 
-    public onSymbolsAllowedUpdated = () => {
+    public onPassPhraseSelected = (phrase: string | undefined) => {
+        this.phrase = phrase;
+        this.updateInputs();
+    }
 
+    public getPasswordLength(): number | undefined {
+        if (!this.passwordLengthRef.current) {
+            return;
+        }
+
+        let len = this.passwordLengthRef.current.valueAsNumber || undefined;
+        if (len && len < 10) {
+            len = undefined;
+        }
+        return len;
+    }
+
+    public onSymbolsAllowedUpdated = (e: React.ChangeEvent<HTMLInputElement>) => {
+        this.symbolsAllowed = e.target.checked;
+        this.updateInputs();
     }
 
     public render() {
@@ -41,20 +63,13 @@ class UIRoot extends React.Component {
                 <hr />
                 <UIDomainInput onDomainPicked={this.onDomainPicked} />
                 <UIFileComponent onFilePicked={this.onFilePicked} />
+                <UIPassPhraseInput onPassPhraseSelected={this.onPassPhraseSelected} />
                 <p className="formsection">
-                    Passphrase
-                <input
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="off"
-                        spellCheck={false}
-                        type="password"
-                        id="passphrase"
+                    Set the password length: <input
+                        type="number"
+                        defaultValue="20"
+                        ref={this.passwordLengthRef}
                     />
-                    <span className="style_hint">(optional) protect your key file</span>
-                </p>
-                <p className="formsection">
-                    Set the password length: <input type="number" id="length" value="20" />
                 </p>
                 <p className="formsection">
                     Allow symbols (/+): <Toggle
@@ -63,21 +78,104 @@ class UIRoot extends React.Component {
                         onChange={this.onSymbolsAllowedUpdated}
                     />
                 </p>
-                <div className="outdiv" id="result">
-                    <span id="password_field" onClick={HACK_UPDATERESULT}>Click to generate, or press Enter</span>
-                    <button
-                        className="btn"
-                        id="copy-button"
-                        data-clipboard-target="#password_field"
-                        title="Click to copy me.">📋</button>
-                </div>
-                <div className="outdiv" id="qrcode"></div>
+                {this.renderOutDiv()}
             </div>);
     }
 
-    private updateState() {
+    private renderCopyButton(): JSX.Element | undefined {
+        if (this.state.password) {
+            return (
+                <button
+                    className="btn"
+                    data-clipboard-target="#password_field"
+                    title="Click to copy me.">
+                    📋
+            </button>);
+        }
+        return;
+    }
+
+    private renderOutDiv(): JSX.Element | undefined {
+        if (this.state.canGenerate) {
+            return (<>
+                <div className="outdiv" id="result">
+                    <p>
+                        <span
+                            onClick={this.startGeneration}>{this.renderPasswordField()}
+                        </span>
+                        {this.renderCopyButton()}
+                    </p>
+                    {this.renderQRCode()}
+                </div>
+            </>);
+        }
+        return undefined;
+    }
+
+    private renderPasswordField(): string {
+        if (this.state.password) {
+            return this.state.password;
+        }
+        if (this.state.generating) {
+            return "Generating...";
+        }
+        if (this.state.canGenerate) {
+            return "Generate!";
+        }
+        return "";
+    }
+
+    private renderQRCode(): JSX.Element | undefined {
+        if (this.state.password) {
+            return <QRCode value={this.state.password} />;
+        }
+        return undefined;
+    }
+
+    private startGeneration = () => {
+        if (!this.file || !this.domain) {
+            return;
+        }
+
+        this.setState({ generating: true });
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            // hack?
+            const crypto = window.crypto.subtle;
+
+            let buffer = reader.result as string;
+
+            // append the domain
+            buffer += this.domain;
+            // append the phrase if any
+            if (this.phrase) {
+                buffer += this.phrase;
+            }
+
+            const raw = new TextEncoder().encode(buffer);
+
+            crypto.digest("SHA-512", raw).then((value: ArrayBuffer) => {
+                const base64String = btoa(String.fromCharCode(...new Uint8Array(value)))
+                    .substring(0, this.getPasswordLength());
+
+                // todo verify the format and restart if needed
+                console.log(this.symbolsAllowed);
+
+                this.setState({
+                    generating: false,
+                    password: base64String,
+                });
+            });
+        };
+
+        reader.readAsBinaryString(this.file);
+    }
+
+    private updateInputs() {
         this.setState({
-            canGenerate: this.filename && this.domain,
+            canGenerate: this.file && this.domain && this.getPasswordLength(),
         });
     }
 }

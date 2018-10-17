@@ -66,7 +66,7 @@ export class UIDomainInput extends React.Component {
 
     public render() {
         return <p className="formsection">
-            <span>Enter the URL of your site{this.okText()}</span>
+            <span>Enter the URL of your site{this.renderOk()}</span>
             <input
                 autoComplete="off"
                 autoCorrect="off"
@@ -75,11 +75,18 @@ export class UIDomainInput extends React.Component {
                 type="url"
                 onChange={this.onChange}
             /><br />
-            <span className="style_hint">{this.state.selectedDomain}</span>
+            <span className="style_hint">{this.renderHint()}</span>
         </p>;
     }
 
-    private okText(): string {
+    private renderHint(): string {
+        if (this.state.selectedDomain) {
+            return this.state.selectedDomain;
+        }
+        return "URL not recognized";
+    }
+
+    private renderOk(): string {
         if (this.state.selectedDomain) {
             return " ✔️";
         }
