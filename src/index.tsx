@@ -8,6 +8,43 @@ import "react-toggle/style.css";
 import Toggle from "react-toggle";
 import { UIPassPhraseInput } from "./passphrase_input";
 
+function isCorrectCharset(
+    password: string,
+    includeLowercase: boolean,
+    includeNumbers: boolean,
+    includeSymbols: boolean,
+    includeUppercase: boolean) {
+
+    let hasNumber = false;
+    let hasSymbol = false;
+    let hasUppercase = false;
+    let hasLowercase = false;
+
+    for (let i = password.length - 1; i >= 0; i--) {
+        const c = password[i];
+
+        if (c >= "a" && c <= "z") {
+            hasLowercase = true;
+        }
+        else if (c >= "A" && c <= "Z") {
+            hasUppercase = true;
+        }
+        else if (c >= "0" && c <= "9") {
+            hasNumber = true;
+        }
+        else {
+            hasSymbol = true;
+        }
+    }
+
+    return (
+        hasLowercase === includeLowercase &&
+        hasNumber === includeNumbers &&
+        hasSymbol === includeSymbols &&
+        hasUppercase === includeUppercase
+    );
+}
+
 class UIRootState {
     public canGenerate: boolean = false;
     public generating: boolean = false;
@@ -20,7 +57,7 @@ class UIRoot extends React.Component {
     private file: File | undefined;
     private domain: string | undefined;
     private phrase: string | undefined;
-    private symbolsAllowed: boolean = true;
+    private requireSymbols: boolean = true;
 
     private passwordLengthRef = React.createRef<HTMLInputElement>();
 
@@ -52,13 +89,19 @@ class UIRoot extends React.Component {
     }
 
     public onSymbolsAllowedUpdated = (e: React.ChangeEvent<HTMLInputElement>) => {
-        this.symbolsAllowed = e.target.checked;
+        this.requireSymbols = e.target.checked;
         this.updateInputs();
+    }
+
+    public onKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && this.state.canGenerate) {
+            this.startGeneration();
+        }
     }
 
     public render() {
         return (
-            <div className="container">
+            <div className="container" onKeyPress={this.onKeyPress}>
                 <h1>Make password, yes?</h1>
                 <hr />
                 <UIDomainInput onDomainPicked={this.onDomainPicked} />
@@ -101,7 +144,8 @@ class UIRoot extends React.Component {
                 <div className="outdiv" id="result">
                     <p>
                         <span
-                            onClick={this.startGeneration}>{this.renderPasswordField()}
+                            onClick={this.startGeneration}>
+                            {this.renderPasswordField()}
                         </span>
                         {this.renderCopyButton()}
                     </p>
@@ -113,11 +157,11 @@ class UIRoot extends React.Component {
     }
 
     private renderPasswordField(): string {
-        if (this.state.password) {
-            return this.state.password;
-        }
         if (this.state.generating) {
             return "Generating...";
+        }
+        if (this.state.password) {
+            return this.state.password;
         }
         if (this.state.canGenerate) {
             return "Generate!";
@@ -154,20 +198,31 @@ class UIRoot extends React.Component {
                 buffer += this.phrase;
             }
 
-            const raw = new TextEncoder().encode(buffer);
+            // this function calls itself until the password fits the requirements
+            const generateIteration = () => {
+                const raw = new TextEncoder().encode(buffer);
 
-            crypto.digest("SHA-512", raw).then((value: ArrayBuffer) => {
-                const base64String = btoa(String.fromCharCode(...new Uint8Array(value)))
-                    .substring(0, this.getPasswordLength());
+                crypto.digest("SHA-512", raw).then((value: ArrayBuffer) => {
+                    const base64String = btoa(String.fromCharCode(...new Uint8Array(value)))
+                        .substring(0, this.getPasswordLength());
 
-                // todo verify the format and restart if needed
-                console.log(this.symbolsAllowed);
-
-                this.setState({
-                    generating: false,
-                    password: base64String,
+                    // check if we good. If not, run append the current password 
+                    // to the end of the blob, and restart
+                    if (isCorrectCharset(base64String, true, true, this.requireSymbols, true)) {
+                        this.setState({
+                            generating: false,
+                            password: base64String,
+                        });
+                    }
+                    else {
+                        buffer += base64String;
+                        generateIteration();
+                    }
                 });
-            });
+            };
+
+            // start the iterations
+            generateIteration();
         };
 
         reader.readAsBinaryString(this.file);
