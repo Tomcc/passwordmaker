@@ -45,6 +45,12 @@ input, .fake_button {
     display: none;
 }
 
+.copy_button {
+    margin: 0.4em;
+    padding: 0.4em;
+    font-size: 120%;
+}
+
 .fake_button {
     min-width: 14.7em;
     text-align: left

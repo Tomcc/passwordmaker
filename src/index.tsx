@@ -7,6 +7,7 @@ import { UIFileComponent } from "./file_component";
 import "react-toggle/style.css";
 import Toggle from "react-toggle";
 import { UIPassPhraseInput } from "./passphrase_input";
+import * as CopyToClipboard from "react-copy-to-clipboard";
 
 function isCorrectCharset(
     password: string,
@@ -128,12 +129,9 @@ class UIRoot extends React.Component {
     private renderCopyButton(): JSX.Element | undefined {
         if (this.state.password) {
             return (
-                <button
-                    className="btn"
-                    data-clipboard-target="#password_field"
-                    title="Click to copy me.">
-                    📋
-            </button>);
+                <CopyToClipboard text={this.state.password}>
+                    <button className="copy_button">📋</button>
+                </CopyToClipboard>);
         }
         return;
     }
