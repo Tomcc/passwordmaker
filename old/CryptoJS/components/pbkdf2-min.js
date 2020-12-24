@@ -1,8 +1,1 @@
-/*
-CryptoJS v3.1.2
-code.google.com/p/crypto-js
-(c) 2009-2013 by Jeff Mott. All rights reserved.
-code.google.com/p/crypto-js/wiki/License
-*/
-(function(){var b=CryptoJS,a=b.lib,d=a.Base,m=a.WordArray,a=b.algo,q=a.HMAC,l=a.PBKDF2=d.extend({cfg:d.extend({keySize:4,hasher:a.SHA1,iterations:1}),init:function(a){this.cfg=this.cfg.extend(a)},compute:function(a,b){for(var c=this.cfg,f=q.create(c.hasher,a),g=m.create(),d=m.create([1]),l=g.words,r=d.words,n=c.keySize,c=c.iterations;l.length<n;){var h=f.update(b).finalize(d);f.reset();for(var j=h.words,s=j.length,k=h,p=1;p<c;p++){k=f.finalize(k);f.reset();for(var t=k.words,e=0;e<s;e++)j[e]^=t[e]}g.concat(h);
-r[0]++}g.sigBytes=4*n;return g}});b.PBKDF2=function(a,b,c){return l.create(c).compute(a,b)}})();
+!function(){var e,t=CryptoJS,r=(e=t.lib).Base,i=e.WordArray,n=(e=t.algo).HMAC,a=e.PBKDF2=r.extend({cfg:r.extend({keySize:4,hasher:e.SHA1,iterations:1}),init:function(e){this.cfg=this.cfg.extend(e)},compute:function(e,t){var r=this.cfg,a=n.create(r.hasher,e),o=i.create(),c=i.create([1]),s=o.words,f=c.words,d=r.keySize;for(r=r.iterations;s.length<d;){var h=a.update(t).finalize(c);a.reset();for(var u=h.words,g=u.length,l=h,v=1;v<r;v++){l=a.finalize(l),a.reset();for(var y=l.words,p=0;p<g;p++)u[p]^=y[p]}o.concat(h),f[0]++}return o.sigBytes=4*d,o}});t.PBKDF2=function(e,t,r){return a.create(r).compute(e,t)}}();
