@@ -6,7 +6,7 @@
   "lang": "en-US",
   "display": "standalone",
   "orientation": "any",
-  "start_url": "/?homescreen=1",
+  "start_url": "/passwordmaker",
   "background_color": "#363644",
   "theme_color": "#fff",
   "icons": [
